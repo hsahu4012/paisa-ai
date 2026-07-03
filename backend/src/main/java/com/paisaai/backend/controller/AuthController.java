@@ -1,10 +1,12 @@
 package com.paisaai.backend.controller;
 
+import com.paisaai.backend.dto.request.LoginRequest;
 import com.paisaai.backend.dto.request.RegisterRequest;
 import com.paisaai.backend.dto.response.ApiResponse;
+import com.paisaai.backend.dto.response.LoginResponse;
 import com.paisaai.backend.dto.response.SecurityQuestionResponse;
 import com.paisaai.backend.dto.response.UserResponse;
-import com.paisaai.backend.service.UserService;
+import com.paisaai.backend.service.AuthenticationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +23,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
-public class UserController {
+public class AuthController {
 
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
     
     @GetMapping("/security-questions")
     public ResponseEntity<ApiResponse<List<SecurityQuestionResponse>>> getSecurityQuestions() {
 
         List<SecurityQuestionResponse> questions =
-                userService.getActiveSecurityQuestions();
+                authenticationService.getActiveSecurityQuestions();
 
         return ResponseEntity.ok(
                 new ApiResponse<>(
@@ -45,7 +47,7 @@ public class UserController {
             @Valid @RequestBody RegisterRequest request) {
     	log.info("<<START>> register");
 
-        UserResponse response = userService.register(request);
+        UserResponse response = authenticationService.register(request);
         log.info("<<END>> register");
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -54,5 +56,20 @@ public class UserController {
                         "User registered successfully",
                         response
                 ));
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request) {
+
+        LoginResponse response = authenticationService.login(request);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Login successful",
+                        response
+                )
+        );
     }
 }

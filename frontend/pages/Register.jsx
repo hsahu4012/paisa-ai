@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+
 
 const Register = () => {
   const [questions, setQuestions] = useState([]);
@@ -231,6 +233,15 @@ const Register = () => {
             Create Account
           </button>
         </form>
+        <p className="text-center text-sm text-gray-500 mt-6">
+            Already have an account?
+            <Link
+                to="/login"
+                className="text-indigo-600 font-medium ml-1"
+            >
+                Login
+            </Link>
+            </p>
       </div>
     </div>
   );
