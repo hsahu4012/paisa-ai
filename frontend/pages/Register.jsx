@@ -1,14 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const Register = () => {
+  const [questions, setQuestions] = useState([]);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     salary: "",
     profession: "",
+    securityAnswers: [
+      {
+        questionId: "",
+        answer: "",
+      },
+      {
+        questionId: "",
+        answer: "",
+      },
+      {
+        questionId: "",
+        answer: "",
+      },
+    ],
   });
+
+  useEffect(() => {
+    fetchSecurityQuestions();
+  }, []);
+
+  const fetchSecurityQuestions = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/api/v1/auth/security-questions"
+      );
+
+      setQuestions(response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -17,13 +49,61 @@ const Register = () => {
     });
   };
 
+  const handleQuestionChange = (index, value) => {
+    const updatedAnswers = [...formData.securityAnswers];
+
+    updatedAnswers[index] = {
+      ...updatedAnswers[index],
+      questionId: value,
+    };
+
+    setFormData({
+      ...formData,
+      securityAnswers: updatedAnswers,
+    });
+  };
+
+  const handleAnswerChange = (index, value) => {
+    const updatedAnswers = [...formData.securityAnswers];
+
+    updatedAnswers[index] = {
+      ...updatedAnswers[index],
+      answer: value,
+    };
+
+    setFormData({
+      ...formData,
+      securityAnswers: updatedAnswers,
+    });
+  };
+
+  const getAvailableQuestions = (currentIndex) => {
+    const selectedIds = formData.securityAnswers
+      .filter((_, index) => index !== currentIndex)
+      .map((item) => item.questionId)
+      .filter(Boolean);
+
+    return questions.filter(
+      (question) =>
+        !selectedIds.includes(question.id.toString())
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      const payload = {
+        ...formData,
+        securityAnswers: formData.securityAnswers.map((item) => ({
+          questionId: Number(item.questionId),
+          answer: item.answer,
+        })),
+      };
+
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/register",
-        formData
+        payload
       );
 
       alert(response.data.message);
@@ -37,112 +117,120 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Create Account
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Join PaisaAI and start managing smarter
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          Create Account
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Full Name
-            </label>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+          />
 
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+          />
 
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Email
-            </label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+          />
 
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+          <input
+            type="number"
+            name="salary"
+            placeholder="Salary"
+            value={formData.salary}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+          />
 
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Password
-            </label>
+          <input
+            type="text"
+            name="profession"
+            placeholder="Profession"
+            value={formData.profession}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-xl"
+            required
+          />
 
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create password"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">
+              Security Questions
+            </h2>
 
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Salary
-            </label>
+            {formData.securityAnswers.map((item, index) => (
+              <div
+                key={index}
+                className="border rounded-xl p-4 mb-4 bg-gray-50"
+              >
+                <label className="block mb-2 font-medium">
+                  Question {index + 1}
+                </label>
 
-            <input
-              type="number"
-              name="salary"
-              value={formData.salary}
-              onChange={handleChange}
-              placeholder="Enter salary"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-          </div>
+                <select
+                  value={item.questionId}
+                  onChange={(e) =>
+                    handleQuestionChange(index, e.target.value)
+                  }
+                  className="w-full px-4 py-3 border rounded-xl mb-3"
+                  required
+                >
+                  <option value="">
+                    Select Security Question
+                  </option>
 
-          <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Profession
-            </label>
+                  {getAvailableQuestions(index).map((question) => (
+                    <option
+                      key={question.id}
+                      value={question.id}
+                    >
+                      {question.question}
+                    </option>
+                  ))}
+                </select>
 
-            <input
-              type="text"
-              name="profession"
-              value={formData.profession}
-              onChange={handleChange}
-              placeholder="Enter profession"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
+                <input
+                  type="text"
+                  placeholder="Your Answer"
+                  value={item.answer}
+                  onChange={(e) =>
+                    handleAnswerChange(index, e.target.value)
+                  }
+                  className="w-full px-4 py-3 border rounded-xl"
+                  required
+                />
+              </div>
+            ))}
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 text-white font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 transition duration-300 shadow-lg"
+            className="w-full py-3 text-white font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700"
           >
             Create Account
           </button>
         </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?
-          <span className="text-indigo-600 font-medium cursor-pointer ml-1">
-            Login
-          </span>
-        </p>
       </div>
     </div>
   );

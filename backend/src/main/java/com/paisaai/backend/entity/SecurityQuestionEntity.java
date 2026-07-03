@@ -26,7 +26,7 @@ public class SecurityQuestionEntity extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
     
-    @JsonIgnore
-    @OneToMany(mappedBy = "securityQuestion")
-    private List<UserSecurityAnswerEntity> userAnswers;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "securityQuestion")
+//    private List<UserSecurityAnswerEntity> userAnswers;
 }

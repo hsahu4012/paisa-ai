@@ -1,5 +1,6 @@
 package com.paisaai.backend.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class RegisterRequest {
@@ -28,4 +30,8 @@ public class RegisterRequest {
     private BigDecimal salary;
 
     private String profession;
+
+    @Valid
+    private List<SecurityAnswerRequest> securityAnswers;
+
 }

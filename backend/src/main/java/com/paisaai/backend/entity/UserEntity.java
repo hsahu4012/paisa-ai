@@ -54,9 +54,9 @@ public class UserEntity extends BaseEntity {
     private UserStatus status;
     
 	
-    @JsonIgnore
-	@OneToMany(mappedBy = "user")
-	private List<UserSecurityAnswerEntity> securityAnswers;
+//    @JsonIgnore
+//	@OneToMany(mappedBy = "user")
+//	private List<UserSecurityAnswerEntity> securityAnswers;
 
     
 }
